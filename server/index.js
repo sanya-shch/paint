@@ -13,6 +13,9 @@ app.ws("/", (ws, req) => {
       case "connection":
         connectionHandler(ws, msg);
         break;
+      case "draw":
+        broadcastConnection(ws, msg);
+        break;
     }
   });
 });

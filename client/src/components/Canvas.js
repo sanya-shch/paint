@@ -6,6 +6,10 @@ import { useParams } from "react-router-dom";
 import canvasState from "../store/canvasState";
 import toolState from "../store/toolState";
 
+import Brush from "../tools/Brush";
+import Rect from "../tools/Rect";
+import Eraser from "../tools/Eraser";
+
 import "../style/canvas.scss";
 
 const Canvas = observer(() => {
@@ -24,6 +28,9 @@ const Canvas = observer(() => {
     if (canvasState.username) {
       const socket = new WebSocket(`ws://localhost:5000/`);
 
+      canvasState.setSocket(socket);
+      canvasState.setSessionId(params.id);
+
       socket.onopen = () => {
         console.log("Подключение установлено");
         socket.send(
@@ -40,6 +47,9 @@ const Canvas = observer(() => {
           case "connection":
             console.log(`пользователь ${msg.username} присоединился`);
             break;
+          case "draw":
+            drawHandler(msg);
+            break;
         }
       };
     }
@@ -52,6 +62,33 @@ const Canvas = observer(() => {
   const connectHandler = () => {
     canvasState.setUsername(usernameRef.current.value);
     setModal(false);
+  };
+
+  const drawHandler = (msg) => {
+    const figure = msg.figure;
+    console.log(figure.type);
+    const ctx = canvasRef.current.getContext("2d");
+    switch (figure.type) {
+      case "brush":
+        Brush.draw(ctx, figure.x, figure.y);
+        break;
+      case "rect":
+        Rect.staticDraw(
+          ctx,
+          figure.x,
+          figure.y,
+          figure.width,
+          figure.height,
+          figure.color
+        );
+        break;
+      case "eraser":
+        Eraser.draw(ctx, figure.x, figure.y);
+        break;
+      case "finish":
+        ctx.beginPath();
+        break;
+    }
   };
 
   return (

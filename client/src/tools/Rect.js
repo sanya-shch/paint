@@ -1,8 +1,8 @@
 import Tool from "./Tool";
 
 export default class Rect extends Tool {
-  constructor(canvas) {
-    super(canvas);
+  constructor(canvas, socket, id) {
+    super(canvas, socket, id);
     this.listen();
   }
 
@@ -14,6 +14,21 @@ export default class Rect extends Tool {
 
   mouseUpHandler(e) {
     this.mouseDown = false;
+
+    this.socket.send(
+      JSON.stringify({
+        method: "draw",
+        id: this.id,
+        figure: {
+          type: "rect",
+          x: this.startX,
+          y: this.startY,
+          width: this.width,
+          height: this.height,
+          color: this.ctx.fillStyle,
+        },
+      })
+    );
   }
   mouseDownHandler(e) {
     this.mouseDown = true;
