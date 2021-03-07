@@ -4,6 +4,7 @@ class CanvasState {
   canvas = null;
   undoList = [];
   redoList = [];
+  username = "";
 
   constructor() {
     makeAutoObservable(this);
@@ -49,6 +50,10 @@ class CanvasState {
         ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
       };
     }
+  }
+
+  setUsername(username) {
+    this.username = username;
   }
 }
 
